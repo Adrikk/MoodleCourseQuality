@@ -34,7 +34,7 @@ $string['report_delete'] = 'Delete';
 
 $string['evaluate_button'] = 'Evaluate course';
 $string['evaluating'] = 'Evaluating…';
-$string['evaluate_done'] = 'Report generated. You can open it from the list above.';
+$string['evaluate_done'] = 'Report generated.';
 $string['evaluate_error'] = 'Evaluation failed.';
 
 $string['evaluation_heading'] = 'Course evaluation';

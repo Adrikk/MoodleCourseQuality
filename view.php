@@ -72,13 +72,20 @@ echo $OUTPUT->render_from_template('local_coursequality/report_summary', [
 $lowbytype = [];
 $rawbytype = $metrics['element_utilization']['low_touch_by_type'] ?? [];
 foreach ($rawbytype as $modname => $items) {
+    $component = 'mod_' . $modname;
+    try {
+        $modtitle = get_string('modulename', $component);
+    } catch (Exception $e) {
+        $modtitle = (string) $modname;
+    }
     $lowbytype[] = [
         'modname' => $modname,
+        'modtitle' => $modtitle,
         'count' => is_array($items) ? count($items) : 0,
         'items' => is_array($items) ? $items : [],
     ];
 }
-usort($lowbytype, fn($a, $b) => strcmp($a['modname'], $b['modname']));
+usort($lowbytype, fn($a, $b) => strcmp((string) $a['modtitle'], (string) $b['modtitle']));
 
 $threshold = (int) ($metrics['element_utilization']['low_touch_threshold_pct'] ?? 5);
 $hint = get_string('element_utilization_hint', 'local_coursequality', $threshold);

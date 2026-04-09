@@ -34,7 +34,7 @@ $string['report_delete'] = 'Удалить';
 
 $string['evaluate_button'] = 'Оценить курс';
 $string['evaluating'] = 'Выполняется оценка…';
-$string['evaluate_done'] = 'Отчёт сформирован. Его можно открыть из списка выше.';
+$string['evaluate_done'] = 'Отчёт сформирован.';
 $string['evaluate_error'] = 'Не удалось выполнить оценку.';
 
 $string['evaluation_heading'] = 'Оценка курса';

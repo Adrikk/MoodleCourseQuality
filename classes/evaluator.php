@@ -428,6 +428,10 @@ class evaluator {
                 continue;
             }
             $cm = $modinfo->cms[$cmid];
+            // Labels are UI-only; exclude them from utilization analysis and "problem elements".
+            if ($cm->modname === 'label') {
+                continue;
+            }
             if (!$cm->uservisible) {
                 continue;
             }
