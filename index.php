@@ -53,22 +53,37 @@ if (!$reports) {
     foreach ($reports as $r) {
         $viewurl = new moodle_url('/local/coursequality/view.php', ['id' => $r->id]);
         $delurl = new moodle_url('/local/coursequality/delete.php', ['id' => $r->id, 'sesskey' => sesskey()]);
+        $viewtitle = get_string('report_view', 'local_coursequality');
+        $deltitle = get_string('report_delete', 'local_coursequality');
+
+        // Match Moodle core action icon markup (FontAwesome solid).
         $eye = html_writer::tag('i', '', [
-            'class' => 'icon fa-regular fa-eye fa-fw',
-            'aria-hidden' => 'true',
+            'class' => 'icon fa fa-eye fa-fw iconsmall',
+            'title' => $viewtitle,
+            'role' => 'img',
+            'aria-label' => $viewtitle,
         ]);
         $trash = html_writer::tag('i', '', [
-            'class' => 'icon fa fa-trash-can fa-fw',
-            'aria-hidden' => 'true',
+            'class' => 'icon fa fa-trash fa-fw iconsmall',
+            'title' => $deltitle,
+            'role' => 'img',
+            'aria-label' => $deltitle,
         ]);
 
-        $actions = html_writer::link($viewurl, $eye, ['title' => get_string('report_view', 'local_coursequality')]);
+        $actions = html_writer::link($viewurl, $eye, [
+            'class' => 'action-icon',
+            'title' => $viewtitle,
+        ]);
         $can_delete = $canmanage || ($canevaluate && $r->userid == $USER->id);
         if ($can_delete) {
             $actions .= ' ' . html_writer::link(
                 $delurl,
                 $trash,
-                ['onclick' => 'return confirm("' . get_string('confirm_delete', 'local_coursequality') . '");']
+                [
+                    'class' => 'action-icon',
+                    'title' => $deltitle,
+                    'onclick' => 'return confirm("' . get_string('confirm_delete', 'local_coursequality') . '");',
+                ]
             );
         }
         $table->data[] = [
