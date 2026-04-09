@@ -31,6 +31,7 @@ $string['report_date'] = 'Сформирован';
 $string['report_score'] = 'Балл';
 $string['report_view'] = 'Открыть';
 $string['report_delete'] = 'Удалить';
+$string['report_deleted'] = 'Отчёт удалён';
 
 $string['evaluate_button'] = 'Оценить курс';
 $string['evaluating'] = 'Выполняется оценка…';
@@ -80,7 +81,7 @@ $string['student_cohort_label'] = 'Студенты (роль student, зачи�
 $string['visible_modules_label'] = 'Видимые модули:';
 $string['logstore_ok'] = 'Стандартные логи: доступны.';
 
-$string['report_details_title'] = 'Детали расчёта и проблемные элементы';
+$string['report_details_title'] = 'Элементы со слабой активностью';
 $string['report_formula'] = 'Итоговый балл = 0.20×Structure + 0.20×Recommended + 0.25×Content use + 0.20×Reach + 0.15×Stability. Все подбаллы приведены к шкале 0–100.';
 
 $string['element_utilization_title'] = 'Используемость видимых элементов';

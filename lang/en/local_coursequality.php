@@ -31,6 +31,7 @@ $string['report_date'] = 'Generated';
 $string['report_score'] = 'Score';
 $string['report_view'] = 'View';
 $string['report_delete'] = 'Delete';
+$string['report_deleted'] = 'Report deleted';
 
 $string['evaluate_button'] = 'Evaluate course';
 $string['evaluating'] = 'Evaluating…';
@@ -80,7 +81,7 @@ $string['student_cohort_label'] = 'Students (role student, enrolled):';
 $string['visible_modules_label'] = 'Visible modules:';
 $string['logstore_ok'] = 'Standard logs: available.';
 
-$string['report_details_title'] = 'Calculation details & low-use elements';
+$string['report_details_title'] = 'Low-activity elements';
 $string['report_formula'] = 'Overall score = 0.20×Structure + 0.20×Recommended + 0.25×Content use + 0.20×Reach + 0.15×Stability. All subscores are scaled to 0–100.';
 
 $string['element_utilization_title'] = 'Visible element utilization';

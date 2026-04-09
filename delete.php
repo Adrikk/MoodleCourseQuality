@@ -5,6 +5,7 @@ require(__DIR__ . '/../../config.php');
 require_once(__DIR__ . '/lib.php');
 
 $id = required_param('id', PARAM_INT);
+$return = optional_param('return', '', PARAM_ALPHA);
 require_sesskey();
 
 $report = $DB->get_record('local_coursequality_report', ['id' => $id], '*', MUST_EXIST);
@@ -31,9 +32,8 @@ if ($canmanage) {
 
 $DB->delete_records('local_coursequality_report', ['id' => $id]);
 
-redirect(
-    new moodle_url('/local/coursequality/index.php', ['id' => $course->id]),
-    get_string('report_delete', 'local_coursequality'),
-    null,
-    \core\output\notification::NOTIFY_SUCCESS
-);
+$target = ($return === 'admin')
+    ? new moodle_url('/local/coursequality/admin/index.php')
+    : new moodle_url('/local/coursequality/index.php', ['id' => $course->id]);
+
+redirect($target, get_string('report_deleted', 'local_coursequality'), null, \core\output\notification::NOTIFY_SUCCESS);

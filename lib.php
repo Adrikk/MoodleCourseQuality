@@ -7,8 +7,6 @@ defined('MOODLE_INTERNAL') || die();
  * Whether the current user is an editing teacher of this course (role shortname editingteacher
  * or role id 3 in standard installs), i.e. holds that role assignment in the course context.
  *
- * Site admins are NOT treated as editing teachers here (they use the admin UI if needed).
- *
  * @param context $context Course context.
  * @return bool
  */
@@ -36,6 +34,26 @@ function local_coursequality_user_is_course_editing_teacher(context $context): b
 }
 
 /**
+ * Whether current user can use the in-course evaluation UI.
+ *
+ * - Editing teachers of the course: allowed.
+ * - Site-level managers/admins: allowed (can evaluate any course without being enrolled).
+ *
+ * @param context $context Course context.
+ * @return bool
+ */
+function local_coursequality_user_can_use_course_tool(context $context): bool {
+    if ($context->contextlevel !== CONTEXT_COURSE) {
+        return false;
+    }
+    $syscontext = context_system::instance();
+    if (is_siteadmin() || has_capability('local/coursequality:manage', $syscontext)) {
+        return true;
+    }
+    return local_coursequality_user_is_course_editing_teacher($context);
+}
+
+/**
  * Add link under course administration (gear / "More" / course settings).
  * Only users with editing teacher role in this course (see above).
  */
@@ -43,7 +61,7 @@ function local_coursequality_extend_settings_navigation(settings_navigation $set
     if ($context->contextlevel !== CONTEXT_COURSE) {
         return;
     }
-    if (!local_coursequality_user_is_course_editing_teacher($context)) {
+    if (!local_coursequality_user_can_use_course_tool($context)) {
         return;
     }
 

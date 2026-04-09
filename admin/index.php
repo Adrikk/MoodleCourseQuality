@@ -51,7 +51,11 @@ $table->attributes['class'] = 'generaltable';
 foreach ($reports as $r) {
     $courseurl = new moodle_url('/course/view.php', ['id' => $r->courseid]);
     $viewurl = new moodle_url('/local/coursequality/view.php', ['id' => $r->id]);
-    $delurl = new moodle_url('/local/coursequality/delete.php', ['id' => $r->id, 'sesskey' => sesskey()]);
+    $delurl = new moodle_url('/local/coursequality/delete.php', [
+        'id' => $r->id,
+        'sesskey' => sesskey(),
+        'return' => 'admin',
+    ]);
     $courselink = html_writer::link($courseurl, format_string($r->shortname, true));
     $userfull = fullname($r);
     $viewtitle = get_string('report_view', 'local_coursequality');

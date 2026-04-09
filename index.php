@@ -9,8 +9,10 @@ $course = get_course($id);
 require_login($course);
 
 $context = context_course::instance($course->id);
+$syscontext = context_system::instance();
+$canmanage = has_capability('local/coursequality:manage', $syscontext);
 
-if (!local_coursequality_user_is_course_editing_teacher($context)) {
+if (!local_coursequality_user_can_use_course_tool($context)) {
     throw new moodle_exception(
         'nopermissions',
         'error',
@@ -18,7 +20,9 @@ if (!local_coursequality_user_is_course_editing_teacher($context)) {
         get_string('error_not_editing_teacher', 'local_coursequality')
     );
 }
-require_capability('local/coursequality:view', $context);
+if (!$canmanage) {
+    require_capability('local/coursequality:view', $context);
+}
 
 $PAGE->set_url(new moodle_url('/local/coursequality/index.php', ['id' => $course->id]));
 $PAGE->set_context($context);
@@ -30,8 +34,8 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('pluginname', 'local_coursequality'));
 
-$canevaluate = local_coursequality_user_is_course_editing_teacher($context)
-    && has_capability('local/coursequality:evaluate', $context);
+$canevaluate = local_coursequality_user_can_use_course_tool($context)
+    && ($canmanage || has_capability('local/coursequality:evaluate', $context));
 
 $reports = $DB->get_records('local_coursequality_report', ['courseid' => $course->id], 'timecreated DESC');
 
@@ -47,8 +51,7 @@ if (!$reports) {
         '',
     ];
     $table->attributes['class'] = 'generaltable';
-    $syscontext = context_system::instance();
-    $canmanage = has_capability('local/coursequality:manage', $syscontext);
+    // $canmanage already computed above.
 
     foreach ($reports as $r) {
         $viewurl = new moodle_url('/local/coursequality/view.php', ['id' => $r->id]);

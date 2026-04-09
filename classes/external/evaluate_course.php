@@ -33,7 +33,7 @@ class evaluate_course extends external_api {
         $context = context_course::instance($courseid, MUST_EXIST);
         self::validate_context($context);
 
-        if (!\local_coursequality_user_is_course_editing_teacher($context)) {
+        if (!\local_coursequality_user_can_use_course_tool($context)) {
             throw new \moodle_exception(
                 'nopermissions',
                 'error',
@@ -41,7 +41,11 @@ class evaluate_course extends external_api {
                 get_string('error_not_editing_teacher', 'local_coursequality')
             );
         }
-        require_capability('local/coursequality:evaluate', $context);
+        $syscontext = \context_system::instance();
+        $canmanage = has_capability('local/coursequality:manage', $syscontext);
+        if (!$canmanage) {
+            require_capability('local/coursequality:evaluate', $context);
+        }
 
         $eval = new evaluator();
         $result = $eval->evaluate($courseid);
