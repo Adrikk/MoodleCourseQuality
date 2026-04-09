@@ -14,6 +14,7 @@ $string['privacy:metadata:local_coursequality_report:totalscore'] = 'Сводн�
 $string['privacy:metadata:local_coursequality_report:metrics'] = 'JSON с подбаллами и счётчиками.';
 
 $string['admin_menu'] = 'Оценка качества курсов';
+$string['admin_category'] = 'Оценка качества курсов';
 $string['nav_course_quality'] = 'Оценить качество курса';
 
 $string['coursequality:evaluate'] = 'Запускать оценку качества курса';

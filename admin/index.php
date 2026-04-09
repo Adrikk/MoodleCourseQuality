@@ -1,7 +1,7 @@
 <?php
 // This file is part of Moodle - http://moodle.org/
 
-require(__DIR__ . '/../../config.php');
+require(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('local_coursequality_admin');
@@ -54,10 +54,19 @@ foreach ($reports as $r) {
     $delurl = new moodle_url('/local/coursequality/delete.php', ['id' => $r->id, 'sesskey' => sesskey()]);
     $courselink = html_writer::link($courseurl, format_string($r->shortname, true));
     $userfull = fullname($r);
-    $actions = html_writer::link($viewurl, get_string('report_view', 'local_coursequality'));
+    $eye = html_writer::tag('i', '', [
+        'class' => 'icon fa-regular fa-eye fa-fw',
+        'aria-hidden' => 'true',
+    ]);
+    $trash = html_writer::tag('i', '', [
+        'class' => 'icon fa fa-trash-can fa-fw',
+        'aria-hidden' => 'true',
+    ]);
+
+    $actions = html_writer::link($viewurl, $eye, ['title' => get_string('report_view', 'local_coursequality')]);
     $actions .= ' ' . html_writer::link(
         $delurl,
-        get_string('report_delete', 'local_coursequality'),
+        $trash,
         ['onclick' => 'return confirm("' . get_string('confirm_delete', 'local_coursequality') . '");']
     );
     $table->data[] = [

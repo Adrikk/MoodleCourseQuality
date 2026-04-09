@@ -14,6 +14,7 @@ $string['privacy:metadata:local_coursequality_report:totalscore'] = 'Aggregate s
 $string['privacy:metadata:local_coursequality_report:metrics'] = 'JSON details of subscores and counters.';
 
 $string['admin_menu'] = 'Course quality evaluations';
+$string['admin_category'] = 'Course quality';
 $string['nav_course_quality'] = 'Evaluate course quality';
 
 $string['coursequality:evaluate'] = 'Run course quality evaluation';

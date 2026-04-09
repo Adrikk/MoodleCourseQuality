@@ -53,12 +53,21 @@ if (!$reports) {
     foreach ($reports as $r) {
         $viewurl = new moodle_url('/local/coursequality/view.php', ['id' => $r->id]);
         $delurl = new moodle_url('/local/coursequality/delete.php', ['id' => $r->id, 'sesskey' => sesskey()]);
-        $actions = html_writer::link($viewurl, get_string('report_view', 'local_coursequality'));
+        $eye = html_writer::tag('i', '', [
+            'class' => 'icon fa-regular fa-eye fa-fw',
+            'aria-hidden' => 'true',
+        ]);
+        $trash = html_writer::tag('i', '', [
+            'class' => 'icon fa fa-trash-can fa-fw',
+            'aria-hidden' => 'true',
+        ]);
+
+        $actions = html_writer::link($viewurl, $eye, ['title' => get_string('report_view', 'local_coursequality')]);
         $can_delete = $canmanage || ($canevaluate && $r->userid == $USER->id);
         if ($can_delete) {
             $actions .= ' ' . html_writer::link(
                 $delurl,
-                get_string('report_delete', 'local_coursequality'),
+                $trash,
                 ['onclick' => 'return confirm("' . get_string('confirm_delete', 'local_coursequality') . '");']
             );
         }
