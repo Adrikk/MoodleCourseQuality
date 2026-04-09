@@ -2,6 +2,7 @@
 // This file is part of Moodle - http://moodle.org/
 
 require(__DIR__ . '/../../config.php');
+require_once(__DIR__ . '/lib.php');
 
 $id = required_param('id', PARAM_INT);
 require_sesskey();

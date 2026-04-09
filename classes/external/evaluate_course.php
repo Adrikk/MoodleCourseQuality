@@ -14,6 +14,7 @@ use stdClass;
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/externallib.php');
+require_once($CFG->dirroot . '/local/coursequality/lib.php');
 
 class evaluate_course extends external_api {
 
