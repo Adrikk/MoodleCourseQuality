@@ -2,11 +2,11 @@
     <div class="card-body">
         <h3 class="card-title">{{#str}} metric_total, local_coursequality {{/str}}: {{totalscore}}</h3>
         <ul class="list-unstyled mb-0">
-            <li><strong>{{#str}} metric_structure, local_coursequality {{/str}}:</strong> {{structure}}</li>
-            <li><strong>{{#str}} metric_recommended, local_coursequality {{/str}}:</strong> {{recommended}}</li>
-            <li><strong>{{#str}} metric_content_use, local_coursequality {{/str}}:</strong> {{content}}</li>
-            <li><strong>{{#str}} metric_reach, local_coursequality {{/str}}:</strong> {{reach}}</li>
-            <li><strong>{{#str}} metric_stability, local_coursequality {{/str}}:</strong> {{stability}}</li>
+            <li><strong>{{#str}} metric_structure, local_coursequality {{/str}}:</strong> {{structure}}<br><span class="text-muted small">{{#str}} metric_structure_desc, local_coursequality {{/str}}</span></li>
+            <li class="mt-2"><strong>{{#str}} metric_recommended, local_coursequality {{/str}}:</strong> {{recommended}}<br><span class="text-muted small">{{#str}} metric_recommended_desc, local_coursequality {{/str}}</span></li>
+            <li class="mt-2"><strong>{{#str}} metric_content_use, local_coursequality {{/str}}:</strong> {{content}}<br><span class="text-muted small">{{#str}} metric_content_use_desc, local_coursequality {{/str}}</span></li>
+            <li class="mt-2"><strong>{{#str}} metric_reach, local_coursequality {{/str}}:</strong> {{reach}}<br><span class="text-muted small">{{#str}} metric_reach_desc, local_coursequality {{/str}}</span></li>
+            <li class="mt-2"><strong>{{#str}} metric_stability, local_coursequality {{/str}}:</strong> {{stability}}<br><span class="text-muted small">{{#str}} metric_stability_desc, local_coursequality {{/str}}</span></li>
         </ul>
         <hr>
         <p class="small text-muted mb-0">{{meta_line}}</p>

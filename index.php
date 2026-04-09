@@ -96,6 +96,8 @@ if (!$reports) {
 }
 
 if ($canevaluate) {
+    echo $OUTPUT->heading(get_string('evaluation_heading', 'local_coursequality'), 3);
+
     echo html_writer::div('', '', ['id' => 'local_coursequality_spinner', 'style' => 'display:none;margin:1rem 0;']);
     echo html_writer::tag(
         'div',
@@ -103,10 +105,44 @@ if ($canevaluate) {
         ['id' => 'local_coursequality_spinner_text', 'class' => 'alert alert-info', 'style' => 'display:none;']
     );
 
+    $today = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->format('Y-m-d');
+
+    $datefields = html_writer::start_div('mb-2');
+    $datefields .= html_writer::tag('label', get_string('evaluation_from', 'local_coursequality'), [
+        'for' => 'local_coursequality_startdate',
+        'class' => 'form-label me-2',
+        'style' => 'margin-right:0.5rem;',
+    ]);
+    $datefields .= html_writer::empty_tag('input', [
+        'type' => 'date',
+        'name' => 'startdate',
+        'id' => 'local_coursequality_startdate',
+        'value' => $today,
+        'class' => 'form-control d-inline-block',
+        'style' => 'width:auto;display:inline-block;margin-right:1rem;',
+        'max' => $today,
+    ]);
+    $datefields .= html_writer::tag('label', get_string('evaluation_to', 'local_coursequality'), [
+        'for' => 'local_coursequality_enddate',
+        'class' => 'form-label me-2',
+        'style' => 'margin-right:0.5rem;',
+    ]);
+    $datefields .= html_writer::empty_tag('input', [
+        'type' => 'date',
+        'name' => 'enddate',
+        'id' => 'local_coursequality_enddate',
+        'value' => $today,
+        'class' => 'form-control d-inline-block',
+        'style' => 'width:auto;display:inline-block;',
+        'max' => $today,
+    ]);
+    $datefields .= html_writer::end_div();
+
     $form = html_writer::tag(
         'form',
         html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'id', 'value' => $course->id]) .
         html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]) .
+        $datefields .
         html_writer::empty_tag('input', [
             'type' => 'submit',
             'class' => 'btn btn-primary',

@@ -13,7 +13,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 class evaluator {
 
-    /** @var int Analysis window in seconds (default 120 days). */
+    /** @var int Fallback analysis window in seconds (default 120 days). */
     protected int $window;
 
     /** @var string[] */
@@ -82,11 +82,62 @@ class evaluator {
     }
 
     /**
+     * Stream log rows to count distinct students per cmid within period.
+     *
+     * Returns map: cmid => distinct students who had crud='r' events for that module.
+     *
+     * @param int[] $studentids
+     * @return array<int,int>
+     */
+    public function get_module_touch_counts(int $courseid, array $studentids, int $since, int $until): array {
+        global $DB;
+
+        if (!$this->logstore_available() || empty($studentids)) {
+            return [];
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($studentids, SQL_PARAMS_NAMED, 'stu');
+        $params = array_merge([
+            'courseid' => $courseid,
+            'since' => $since,
+            'until' => $until,
+            'ctxmodule' => CONTEXT_MODULE,
+        ], $inparams);
+
+        $sql = "SELECT userid, contextinstanceid AS cmid
+                  FROM {logstore_standard_log}
+                 WHERE courseid = :courseid
+                   AND contextlevel = :ctxmodule
+                   AND timecreated >= :since
+                   AND timecreated <= :until
+                   AND crud = 'r'
+                   AND userid $insql";
+
+        $rs = $DB->get_recordset_sql($sql, $params);
+        $seen = [];
+        $counts = [];
+        foreach ($rs as $row) {
+            $cmid = (int) $row->cmid;
+            $uid = (int) $row->userid;
+            if (!isset($seen[$cmid])) {
+                $seen[$cmid] = [];
+            }
+            if (!isset($seen[$cmid][$uid])) {
+                $seen[$cmid][$uid] = true;
+                $counts[$cmid] = ($counts[$cmid] ?? 0) + 1;
+            }
+        }
+        $rs->close();
+
+        return $counts;
+    }
+
+    /**
      * Distinct students with any log row in course in window.
      *
      * @param int[] $studentids
      */
-    public function count_active_students(int $courseid, array $studentids, int $since): int {
+    public function count_active_students(int $courseid, array $studentids, int $since, int $until): int {
         global $DB;
 
         if (!$this->logstore_available() || empty($studentids)) {
@@ -94,12 +145,13 @@ class evaluator {
         }
 
         [$insql, $inparams] = $DB->get_in_or_equal($studentids, SQL_PARAMS_NAMED, 'stu');
-        $params = array_merge(['courseid' => $courseid, 'since' => $since], $inparams);
+        $params = array_merge(['courseid' => $courseid, 'since' => $since, 'until' => $until], $inparams);
 
         $sql = "SELECT COUNT(DISTINCT userid)
                   FROM {logstore_standard_log}
                  WHERE courseid = :courseid
                    AND timecreated >= :since
+                   AND timecreated <= :until
                    AND userid $insql";
 
         return (int) $DB->get_field_sql($sql, $params);
@@ -110,7 +162,7 @@ class evaluator {
      *
      * @param int[] $studentids
      */
-    public function count_students_touching_cmid(int $courseid, int $cmid, array $studentids, int $since): int {
+    public function count_students_touching_cmid(int $courseid, int $cmid, array $studentids, int $since, int $until): int {
         global $DB;
 
         if (!$this->logstore_available() || empty($studentids)) {
@@ -122,6 +174,7 @@ class evaluator {
             'courseid' => $courseid,
             'cmid' => $cmid,
             'since' => $since,
+            'until' => $until,
             'ctxmodule' => CONTEXT_MODULE,
         ], $inparams);
 
@@ -132,6 +185,7 @@ class evaluator {
                    AND contextlevel = :ctxmodule
                    AND contextinstanceid = :cmid
                    AND timecreated >= :since
+                   AND timecreated <= :until
                    AND crud = 'r'
                    AND userid $insql";
 
@@ -144,7 +198,7 @@ class evaluator {
      * @param int[] $studentids
      * @return float[] values 0..1 fraction of cohort per ISO week index
      */
-    public function weekly_active_fractions(int $courseid, array $studentids, int $since): array {
+    public function weekly_active_fractions(int $courseid, array $studentids, int $since, int $until): array {
         global $DB;
 
         if (!$this->logstore_available() || empty($studentids)) {
@@ -152,12 +206,13 @@ class evaluator {
         }
 
         [$insql, $inparams] = $DB->get_in_or_equal($studentids, SQL_PARAMS_NAMED, 'stu');
-        $params = array_merge(['courseid' => $courseid, 'since' => $since], $inparams);
+        $params = array_merge(['courseid' => $courseid, 'since' => $since, 'until' => $until], $inparams);
 
         $sql = "SELECT userid, timecreated
                   FROM {logstore_standard_log}
                  WHERE courseid = :courseid
                    AND timecreated >= :since
+                   AND timecreated <= :until
                    AND userid $insql";
 
         $rows = $DB->get_recordset_sql($sql, $params);
@@ -247,7 +302,7 @@ class evaluator {
      * @param array<int,stdClass> $modules
      * @param int[] $studentids
      */
-    protected function score_content_utilization(array $modules, int $courseid, array $studentids, int $since): array {
+    protected function score_content_utilization(array $modules, int $courseid, array $studentids, int $since, int $until): array {
         $contentcms = [];
         foreach ($modules as $cm) {
             if (in_array($cm->modname, $this->contentmods, true)) {
@@ -267,7 +322,7 @@ class evaluator {
         $dead = 0;
         $cohort = count($studentids);
         foreach ($contentcms as $cm) {
-            $touched = $this->count_students_touching_cmid($courseid, (int) $cm->cmid, $studentids, $since);
+            $touched = $this->count_students_touching_cmid($courseid, (int) $cm->cmid, $studentids, $since, $until);
             $r = $cohort > 0 ? $touched / $cohort : 0.0;
             $rates[] = $r;
             if ($r < 0.05) {
@@ -290,7 +345,7 @@ class evaluator {
      *
      * @param int[] $studentids
      */
-    protected function score_reach_and_stability(int $courseid, array $studentids, int $since): array {
+    protected function score_reach_and_stability(int $courseid, array $studentids, int $since, int $until): array {
         $cohort = count($studentids);
         if ($cohort === 0) {
             return [
@@ -302,11 +357,11 @@ class evaluator {
             ];
         }
 
-        $active = $this->count_active_students($courseid, $studentids, $since);
+        $active = $this->count_active_students($courseid, $studentids, $since, $until);
         $share = $active / $cohort;
         $reachscore = round(min(1.0, $share / 0.85) * 100, 2); // 85% ever active in window ~ excellent.
 
-        $fracs = $this->weekly_active_fractions($courseid, $studentids, $since);
+        $fracs = $this->weekly_active_fractions($courseid, $studentids, $since, $until);
         if (count($fracs) < 3) {
             $stab = 50.0; // Not enough weeks.
             $cv = null;
@@ -341,11 +396,13 @@ class evaluator {
      *
      * @return array{total: float, metrics: array}
      */
-    public function evaluate(int $courseid): array {
+    public function evaluate(int $courseid, ?int $since = null, ?int $until = null): array {
         global $CFG;
+        require_once($CFG->dirroot . '/course/lib.php');
 
         $now = time();
-        $since = $now - $this->window;
+        $since = $since ?? ($now - $this->window);
+        $until = $until ?? $now;
 
         $modules = $this->get_visible_modules($courseid);
         $struct = $this->structure_entropy($modules);
@@ -354,8 +411,48 @@ class evaluator {
         $rec = $this->score_recommended($modules);
 
         $studentids = $this->get_student_userids($courseid);
-        $content = $this->score_content_utilization($modules, $courseid, $studentids, $since);
-        $rs = $this->score_reach_and_stability($courseid, $studentids, $since);
+        $content = $this->score_content_utilization($modules, $courseid, $studentids, $since, $until);
+        $rs = $this->score_reach_and_stability($courseid, $studentids, $since, $until);
+
+        // Element-level utilization snapshot (visible modules) based on student touch-rate.
+        $touchcounts = $this->get_module_touch_counts($courseid, $studentids, $since, $until);
+        $cohort = max(1, count($studentids));
+        $lowthreshold = 0.05;
+        $bytype = [];
+
+        // Use modinfo to get human names + URLs.
+        $modinfo = get_fast_modinfo($courseid);
+        foreach ($modules as $m) {
+            $cmid = (int) $m->cmid;
+            if (empty($modinfo->cms[$cmid])) {
+                continue;
+            }
+            $cm = $modinfo->cms[$cmid];
+            if (!$cm->uservisible) {
+                continue;
+            }
+            $touched = (int) ($touchcounts[$cmid] ?? 0);
+            $rate = $touched / $cohort;
+            if ($rate > $lowthreshold) {
+                continue;
+            }
+            $type = (string) $cm->modname;
+            if (!isset($bytype[$type])) {
+                $bytype[$type] = [];
+            }
+            $bytype[$type][] = [
+                'cmid' => $cmid,
+                'name' => $cm->get_formatted_name(),
+                'url' => $cm->url ? $cm->url->out(false) : '',
+                'touched' => $touched,
+                'touchrate' => round($rate * 100, 2),
+            ];
+        }
+        // Sort within each type by touchrate asc.
+        foreach ($bytype as $type => &$items) {
+            usort($items, fn($a, $b) => ($a['touchrate'] <=> $b['touchrate']) ?: ($a['cmid'] <=> $b['cmid']));
+        }
+        unset($items);
 
         $weights = [
             'structure' => 0.20,
@@ -372,8 +469,11 @@ class evaluator {
             + $weights['stability'] * $rs['stability_score'];
 
         $metrics = [
-            'window_days' => (int) ($this->window / DAYSECS),
+            'window_days' => (int) round(($until - $since) / DAYSECS),
             'window_since' => userdate($since),
+            'window_until' => userdate($until),
+            'window_since_ts' => $since,
+            'window_until_ts' => $until,
             'logstore' => $this->logstore_available(),
             'visible_modules' => count($modules),
             'student_cohort' => count($studentids),
@@ -396,6 +496,10 @@ class evaluator {
                 'score' => $rs['stability_score'],
                 'weekly_cv' => $rs['weekly_cv'],
                 'weeks_observed' => $rs['weeks_observed'],
+            ],
+            'element_utilization' => [
+                'low_touch_threshold_pct' => (int) round($lowthreshold * 100),
+                'low_touch_by_type' => $bytype,
             ],
             'weights' => $weights,
             'moodle_release' => $CFG->release ?? '',

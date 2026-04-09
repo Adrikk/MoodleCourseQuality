@@ -37,6 +37,15 @@ $string['evaluating'] = 'Выполняется оценка…';
 $string['evaluate_done'] = 'Отчёт сформирован. Его можно открыть из списка выше.';
 $string['evaluate_error'] = 'Не удалось выполнить оценку.';
 
+$string['evaluation_heading'] = 'Оценка курса';
+$string['evaluation_from'] = 'С';
+$string['evaluation_to'] = 'по';
+
+$string['error_choose_dates'] = 'Выберите даты начала и завершения анализа (нельзя оставлять оба значения равными сегодняшнему дню).';
+$string['error_invalid_dates'] = 'Некорректный формат даты. Ожидается ГГГГ-ММ-ДД.';
+$string['error_end_in_future'] = 'Дата окончания не может быть позже сегодняшнего дня.';
+$string['error_start_after_end'] = 'Дата начала не может быть позже даты окончания.';
+
 $string['confirm_delete'] = 'Удалить этот отчёт безвозвратно?';
 
 $string['metric_total'] = 'Итоговый балл';
@@ -45,6 +54,12 @@ $string['metric_recommended'] = 'Рекомендуемые типы актив�
 $string['metric_content_use'] = 'Использование теоретических материалов';
 $string['metric_reach'] = 'Охват студентов';
 $string['metric_stability'] = 'Стабильность вовлечённости';
+
+$string['metric_structure_desc'] = 'Оценивает разнообразие видимых элементов курса по типам (энтропия распределения + число типов).';
+$string['metric_recommended_desc'] = 'Доля рекомендуемых типов активностей, которые присутствуют среди видимых элементов курса (lesson/quiz/assign/H5P/game и т.д.).';
+$string['metric_content_use_desc'] = 'Средняя доля студентов, которые открывали теоретические элементы (page/book/resource/folder/url) в выбранный период; мёртвые элементы учитываются как <5%.';
+$string['metric_reach_desc'] = 'Доля студентов, у которых есть хотя бы одно событие в логах курса за выбранный период.';
+$string['metric_stability_desc'] = 'Стабильность недельной активности: чем меньше колебания доли активных студентов по неделям, тем выше балл.';
 
 $string['admin_reports'] = 'Все отчёты';
 $string['admin_bulk'] = 'Массовая оценка';
@@ -64,3 +79,10 @@ $string['window_days_label'] = 'Окно анализа (дней):';
 $string['student_cohort_label'] = 'Студенты (роль student, зачислены):';
 $string['visible_modules_label'] = 'Видимые модули:';
 $string['logstore_ok'] = 'Стандартные логи: доступны.';
+
+$string['report_details_title'] = 'Детали расчёта и проблемные элементы';
+$string['report_formula'] = 'Итоговый балл = 0.20×Structure + 0.20×Recommended + 0.25×Content use + 0.20×Reach + 0.15×Stability. Все подбаллы приведены к шкале 0–100.';
+
+$string['element_utilization_title'] = 'Используемость видимых элементов';
+$string['element_utilization_hint'] = 'Ниже показаны видимые элементы курса, которые в выбранный период открывали ≤{$a}% студентов (crud=r в стандартных логах). Список сгруппирован по типам и отсортирован по возрастанию активности.';
+$string['element_utilization_none'] = 'Элементов с низкой активностью по заданному порогу не обнаружено.';

@@ -37,6 +37,15 @@ $string['evaluating'] = 'Evaluating…';
 $string['evaluate_done'] = 'Report generated. You can open it from the list above.';
 $string['evaluate_error'] = 'Evaluation failed.';
 
+$string['evaluation_heading'] = 'Course evaluation';
+$string['evaluation_from'] = 'From';
+$string['evaluation_to'] = 'to';
+
+$string['error_choose_dates'] = 'Please select a valid analysis period (both dates cannot remain set to today).';
+$string['error_invalid_dates'] = 'Invalid date format. Expected YYYY-MM-DD.';
+$string['error_end_in_future'] = 'End date cannot be later than today.';
+$string['error_start_after_end'] = 'Start date cannot be after end date.';
+
 $string['confirm_delete'] = 'Delete this report permanently?';
 
 $string['metric_total'] = 'Overall score';
@@ -45,6 +54,12 @@ $string['metric_recommended'] = 'Recommended activity types';
 $string['metric_content_use'] = 'Theory/content utilization';
 $string['metric_reach'] = 'Student reach';
 $string['metric_stability'] = 'Engagement stability';
+
+$string['metric_structure_desc'] = 'Measures diversity of visible course elements by type (entropy + number of types).';
+$string['metric_recommended_desc'] = 'Share of recommended activity types present among visible modules (lesson/quiz/assign/H5P/game, etc.).';
+$string['metric_content_use_desc'] = 'Average share of students who opened theory/content modules (page/book/resource/folder/url) within the selected period; low-use modules (<5%) are penalized.';
+$string['metric_reach_desc'] = 'Share of students who generated at least one log event in the course during the selected period.';
+$string['metric_stability_desc'] = 'Weekly stability of student activity: lower week-to-week variation yields a higher score.';
 
 $string['admin_reports'] = 'All reports';
 $string['admin_bulk'] = 'Bulk evaluation';
@@ -64,3 +79,10 @@ $string['window_days_label'] = 'Analysis window (days):';
 $string['student_cohort_label'] = 'Students (role student, enrolled):';
 $string['visible_modules_label'] = 'Visible modules:';
 $string['logstore_ok'] = 'Standard logs: available.';
+
+$string['report_details_title'] = 'Calculation details & low-use elements';
+$string['report_formula'] = 'Overall score = 0.20×Structure + 0.20×Recommended + 0.25×Content use + 0.20×Reach + 0.15×Stability. All subscores are scaled to 0–100.';
+
+$string['element_utilization_title'] = 'Visible element utilization';
+$string['element_utilization_hint'] = 'Below are visible course elements that were opened by ≤{$a}% of students within the selected period (crud=r in standard logs). Grouped by type and sorted by ascending activity.';
+$string['element_utilization_none'] = 'No low-activity elements were found for the chosen threshold.';

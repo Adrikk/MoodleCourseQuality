@@ -39,8 +39,16 @@ if (!is_array($metrics)) {
 $logstorenote = !empty($metrics['logstore'])
     ? get_string('logstore_ok', 'local_coursequality')
     : get_string('error_logstore', 'local_coursequality');
+
+$period = '—';
+if (!empty($metrics['window_since_ts']) && !empty($metrics['window_until_ts'])) {
+    $period = gmdate('d.m.Y', (int) $metrics['window_since_ts']) . '-' . gmdate('d.m.Y', (int) $metrics['window_until_ts']);
+} else if (!empty($metrics['window_since']) && !empty($metrics['window_until'])) {
+    // Fallback to stored userdate strings if timestamps are missing.
+    $period = (string) $metrics['window_since'] . '-' . (string) $metrics['window_until'];
+}
 $meta = implode(' · ', [
-    get_string('window_days_label', 'local_coursequality') . ' ' . ($metrics['window_days'] ?? '—'),
+    get_string('window_days_label', 'local_coursequality') . ' ' . $period,
     get_string('student_cohort_label', 'local_coursequality') . ' ' . ($metrics['student_cohort'] ?? '—'),
     get_string('visible_modules_label', 'local_coursequality') . ' ' . ($metrics['visible_modules'] ?? '—'),
     $logstorenote,
@@ -61,9 +69,24 @@ echo $OUTPUT->render_from_template('local_coursequality/report_summary', [
     'meta_line' => $meta,
 ]);
 
-echo html_writer::tag('pre', s(json_encode($metrics, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)), [
-    'class' => 'bg-light p-3 rounded',
-    'style' => 'max-height:28rem;overflow:auto;font-size:0.85rem;',
+$lowbytype = [];
+$rawbytype = $metrics['element_utilization']['low_touch_by_type'] ?? [];
+foreach ($rawbytype as $modname => $items) {
+    $lowbytype[] = [
+        'modname' => $modname,
+        'count' => is_array($items) ? count($items) : 0,
+        'items' => is_array($items) ? $items : [],
+    ];
+}
+usort($lowbytype, fn($a, $b) => strcmp($a['modname'], $b['modname']));
+
+$threshold = (int) ($metrics['element_utilization']['low_touch_threshold_pct'] ?? 5);
+$hint = get_string('element_utilization_hint', 'local_coursequality', $threshold);
+
+echo $OUTPUT->render_from_template('local_coursequality/report_details', [
+    'element_utilization_hint' => $hint,
+    'has_low_touch' => !empty($lowbytype),
+    'low_touch_by_type' => $lowbytype,
 ]);
 
 $back = new moodle_url('/local/coursequality/index.php', ['id' => $course->id]);

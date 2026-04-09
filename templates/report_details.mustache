@@ -1,0 +1,30 @@
+<details class="mb-3">
+    <summary class="h6 mb-2">{{#str}} report_details_title, local_coursequality {{/str}}</summary>
+    <div class="mt-2">
+        <p class="small text-muted">{{#str}} report_formula, local_coursequality {{/str}}</p>
+
+        <h6 class="mt-3 mb-2">{{#str}} element_utilization_title, local_coursequality {{/str}}</h6>
+        <p class="small text-muted mb-2">{{element_utilization_hint}}</p>
+
+        {{#has_low_touch}}
+            {{#low_touch_by_type}}
+                <details class="mb-2">
+                    <summary><strong>{{modname}}</strong> ({{count}})</summary>
+                    <ul class="mb-2 mt-2">
+                        {{#items}}
+                            <li>
+                                {{#url}}<a href="{{url}}">{{name}}</a>{{/url}}
+                                {{^url}}{{name}}{{/url}}
+                                <span class="text-muted small">— {{touchrate}}% ({{touched}})</span>
+                            </li>
+                        {{/items}}
+                    </ul>
+                </details>
+            {{/low_touch_by_type}}
+        {{/has_low_touch}}
+        {{^has_low_touch}}
+            <div class="alert alert-success">{{#str}} element_utilization_none, local_coursequality {{/str}}</div>
+        {{/has_low_touch}}
+    </div>
+</details>
+
