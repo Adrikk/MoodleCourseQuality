@@ -1,0 +1,15 @@
+### Ignore non-plugin artifacts
+
+# Old analysis files (if present)
+/oldFilesForAnalyze/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+
+# Python cache (in case helper scripts appear)
+__pycache__/
+*.pyc
+
